@@ -121,7 +121,8 @@ export class Session implements NavigatorDelegate {
   // Link click observer delegate
 
   willFollowLinkToLocation(link: Element, location: Location) {
-    return this.elementIsNavigable(link)
+    return elementIsNavigable(link)
+      && !linkTargetsIframe(link)
       && this.locationIsVisitable(location)
       && this.applicationAllowsFollowingLinkToLocation(link, location)
   }
@@ -152,7 +153,7 @@ export class Session implements NavigatorDelegate {
   // Form submit observer delegate
 
   willSubmitForm(form: HTMLFormElement, submitter?: HTMLElement): boolean {
-    return this.elementIsNavigable(form) && this.elementIsNavigable(submitter)
+    return elementIsNavigable(form) && elementIsNavigable(submitter)
   }
 
   formSubmitted(form: HTMLFormElement, submitter?: HTMLElement) {
@@ -246,16 +247,24 @@ export class Session implements NavigatorDelegate {
     return isAction(action) ? action : "advance"
   }
 
-  elementIsNavigable(element?: Element) {
-    const container = element?.closest("[data-turbo]")
-    if (container) {
-      return container.getAttribute("data-turbo") != "false"
-    } else {
-      return true
-    }
-  }
-
   locationIsVisitable(location: Location) {
     return location.isPrefixedBy(this.view.getRootLocation()) && location.isHTML()
+  }
+}
+
+function elementIsNavigable(element?: Element) {
+  const container = element?.closest("[data-turbo]")
+  if (container) {
+    return container.getAttribute("data-turbo") != "false"
+  } else {
+    return true
+  }
+}
+
+function linkTargetsIframe(link: Element): boolean {
+  if (link instanceof HTMLAnchorElement) {
+    return !!document.querySelector(`iframe[name="${link.target}"]`)
+  } else {
+    return false
   }
 }
