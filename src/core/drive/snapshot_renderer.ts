@@ -58,7 +58,7 @@ export class SnapshotRenderer extends Renderer {
     const placeholders = this.relocateCurrentBodyPermanentElements()
     this.activateNewBody()
     this.assignNewBody()
-    this.replacePlaceholderElementsWithClonedPermanentElements(placeholders)
+    // this.replacePlaceholderElementsWithClonedPermanentElements(placeholders)
   }
 
   shouldRender() {
@@ -98,8 +98,8 @@ export class SnapshotRenderer extends Renderer {
       const newElement = this.newSnapshot.getPermanentElementById(permanentElement.id)
       if (newElement) {
         const placeholder = createPlaceholderForPermanentElement(permanentElement)
-        replaceElementWithElement(permanentElement, placeholder.element)
-        replaceElementWithElement(newElement, permanentElement)
+        // replaceElementWithElement(permanentElement, placeholder.element)
+        replaceElementWithElement(newElement, permanentElement.cloneNode(true))
         return [ ...placeholders, placeholder ]
       } else {
         return placeholders
